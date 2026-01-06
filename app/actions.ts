@@ -66,7 +66,18 @@ export async function getExamData() {
     const examData: ExamData[] = itemMatches.map((itemXml, index) => {
       const getTagValue = (tag: string) => {
         const match = itemXml.match(new RegExp(`<${tag}>(.*?)<\/${tag}>`, 's'))
-        return match ? match[1].trim() : ""
+        let value = match ? match[1].trim() : ""
+        
+        // CDATA 제거
+        value = value.replace(/<!\[CDATA\[(.*?)\]\]>/gs, '$1')
+        
+        // HTML 태그 제거 (간단한 텍스트만 추출)
+        value = value.replace(/<[^>]*>/g, ' ')
+        
+        // 연속된 공백 정리
+        value = value.replace(/\s+/g, ' ').trim()
+        
+        return value
       }
       
       return {
@@ -127,7 +138,18 @@ export async function getJobData() {
     const jobData: JobData[] = itemMatches.map((itemXml) => {
       const getTagValue = (tag: string) => {
         const match = itemXml.match(new RegExp(`<${tag}>(.*?)<\/${tag}>`, 's'))
-        return match ? match[1].trim() : ""
+        let value = match ? match[1].trim() : ""
+        
+        // CDATA 제거
+        value = value.replace(/<!\[CDATA\[(.*?)\]\]>/gs, '$1')
+        
+        // HTML 태그 제거 (간단한 텍스트만 추출)
+        value = value.replace(/<[^>]*>/g, ' ')
+        
+        // 연속된 공백 정리
+        value = value.replace(/\s+/g, ' ').trim()
+        
+        return value
       }
       
       const rceptBegin = getTagValue("rceptBeginDte")
