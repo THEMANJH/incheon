@@ -31,8 +31,13 @@ export async function getExamData() {
     console.log("[v0] Exam API 호출 시작")
     
     const response = await fetch(
-      `https://api.odcloud.kr/api/apnmOrganRecrtInfoInqireService/v1/getApnmOrganRecrtInfoInqire?page=1&perPage=20&serviceKey=${apiKey}`,
+      `https://api.odcloud.kr/api/apnmOrganRecrtInfoInqireService/v1/getApnmOrganRecrtInfoInqire?page=1&perPage=20`,
       {
+        method: 'GET',
+        headers: {
+          'Authorization': `Infuser ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
         cache: "no-store",
       },
     )
@@ -62,8 +67,13 @@ export async function getJobData() {
     console.log("[v0] Job API 호출 시작")
     
     const response = await fetch(
-      `https://api.odcloud.kr/api/apnmOrganJobOfferInfoInqireService/v1/getApnmOrganJobOfferInfoInqire?page=1&perPage=20&serviceKey=${apiKey}`,
+      `https://api.odcloud.kr/api/apnmOrganJobOfferInfoInqireService/v1/getApnmOrganJobOfferInfoInqire?page=1&perPage=20`,
       {
+        method: 'GET',
+        headers: {
+          'Authorization': `Infuser ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
         cache: "no-store",
       },
     )
