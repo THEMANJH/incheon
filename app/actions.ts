@@ -11,6 +11,9 @@ interface ExamData {
   DISTNM: string
   RECRMTHCD: string
   REGISTDT: string
+  // 실제 API 필드
+  cn?: string // 내용
+  wrterDeptNm?: string // 작성부서
 }
 
 interface JobData {
@@ -23,6 +26,14 @@ interface JobData {
   WORK_PARD: string
   WORK_LOC: string
   REGISTR_DE: string
+  // 추가 상세 정보
+  dtyCn?: string // 직무내용
+  rcritNmpr?: string // 모집인원
+  careerCnd?: string // 경력조건
+  acdmcr?: string // 학력
+  formalMth?: string // 전형방법
+  presentnPapers?: string // 제출서류
+  etcReferMatter?: string // 기타참고사항
 }
 
 export async function getExamData() {
@@ -68,7 +79,10 @@ export async function getExamData() {
         DISTCODE: "28",
         DISTNM: "인천광역시",
         RECRMTHCD: "공개경쟁",
-        REGISTDT: getTagValue("wrterDe") || "",
+        REGISTDT: getTagValue("writngDe") || "",
+        // 실제 API 필드
+        cn: getTagValue("cn") || "",
+        wrterDeptNm: getTagValue("wrterDeptNm") || "",
       }
     })
     
@@ -130,6 +144,14 @@ export async function getJobData() {
         WORK_PARD: getTagValue("emplymStle") || "",
         WORK_LOC: "인천광역시",
         REGISTR_DE: getTagValue("writngDe") || "",
+        // 추가 상세 정보
+        dtyCn: getTagValue("dtyCn") || "",
+        rcritNmpr: getTagValue("rcritNmpr") || "",
+        careerCnd: getTagValue("careerCnd") || "",
+        acdmcr: getTagValue("acdmcr") || "",
+        formalMth: getTagValue("formalMth") || "",
+        presentnPapers: getTagValue("presentnPapers") || "",
+        etcReferMatter: getTagValue("etcReferMatter") || "",
       }
     })
     
