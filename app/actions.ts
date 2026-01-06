@@ -49,23 +49,28 @@ export async function getExamData() {
     const xmlText = await response.text()
     console.log("[DEBUG] XML Response:", xmlText)
     
-    // XML을 파싱해서 JSON으로 변환
-    const parser = new DOMParser()
-    const xmlDoc = parser.parseFromString(xmlText, "text/xml")
-    const items = xmlDoc.getElementsByTagName("item")
+    // 간단한 XML 파싱 (정규식 사용)
+    const itemMatches = xmlText.match(/<item>(.*?)<\/item>/gs) || []
     
-    const examData: ExamData[] = Array.from(items).map((item, index) => ({
-      RECRNO: item.getElementsByTagName("listNum")[0]?.textContent || `${index + 1}`,
-      RECRTITLE: item.getElementsByTagName("sj")[0]?.textContent || "",
-      REQCAREER: "정보 없음",
-      REQEDUFORM: "정보 없음", 
-      RECRSTDATE: "정보 없음",
-      RECRENDDATE: "정보 없음",
-      DISTCODE: "28",
-      DISTNM: "인천광역시",
-      RECRMTHCD: "공개경쟁",
-      REGISTDT: item.getElementsByTagName("wrterDe")[0]?.textContent || "",
-    }))
+    const examData: ExamData[] = itemMatches.map((itemXml, index) => {
+      const getTagValue = (tag: string) => {
+        const match = itemXml.match(new RegExp(`<${tag}>(.*?)<\/${tag}>`, 's'))
+        return match ? match[1].trim() : ""
+      }
+      
+      return {
+        RECRNO: getTagValue("listNum") || `${index + 1}`,
+        RECRTITLE: getTagValue("sj") || "",
+        REQCAREER: "정보 없음",
+        REQEDUFORM: "정보 없음", 
+        RECRSTDATE: "정보 없음",
+        RECRENDDATE: "정보 없음",
+        DISTCODE: "28",
+        DISTNM: "인천광역시",
+        RECRMTHCD: "공개경쟁",
+        REGISTDT: getTagValue("wrterDe") || "",
+      }
+    })
     
     console.log("[DEBUG] Parsed exam data:", examData)
     return { success: true, data: examData }
@@ -102,22 +107,31 @@ export async function getJobData() {
     const xmlText = await response.text()
     console.log("[DEBUG] XML Response:", xmlText)
     
-    // XML을 파싱해서 JSON으로 변환
-    const parser = new DOMParser()
-    const xmlDoc = parser.parseFromString(xmlText, "text/xml")
-    const items = xmlDoc.getElementsByTagName("item")
+    // 간단한 XML 파싱 (정규식 사용)
+    const itemMatches = xmlText.match(/<item>(.*?)<\/item>/gs) || []
     
-    const jobData: JobData[] = Array.from(items).map((item) => ({
-      ENTRPS_NM: "인천광역시", // XML에 기업명 필드가 없어서 기본값
-      RECRIT_TITL: item.getElementsByTagName("sj")[0]?.textContent || "",
-      RECRIT_DEPT: item.getElementsByTagName("rcritJssfc")[0]?.textContent || "",
-      NCCS_RCEPT_DT: `${item.getElementsByTagName("rceptBeginDte")[0]?.textContent || ""} ~ ${item.getElementsByTagName("rceptEndDte")[0]?.textContent || ""}`,
-      NCCS_RCEPT_MTHD: item.getElementsByTagName("rceptMth")[0]?.textContent || "",
-      WAGE: item.getElementsByTagName("wageCnd")[0]?.textContent || "",
-      WORK_PARD: item.getElementsByTagName("emplymStle")[0]?.textContent || "",
-      WORK_LOC: "인천광역시", // XML에 근무지 필드가 없어서 기본값
-      REGISTR_DE: item.getElementsByTagName("writngDe")[0]?.textContent || "",
-    }))
+    const jobData: JobData[] = itemMatches.map((itemXml) => {
+      const getTagValue = (tag: string) => {
+        const match = itemXml.match(new RegExp(`<${tag}>(.*?)<\/${tag}>`, 's'))
+        return match ? match[1].trim() : ""
+      }
+      
+      const rceptBegin = getTagValue("rceptBeginDte")
+      const rceptEnd = getTagValue("rceptEndDte")
+      const rceptPeriod = rceptBegin && rceptEnd ? `${rceptBegin} ~ ${rceptEnd}` : (rceptBegin || rceptEnd || "정보 없음")
+      
+      return {
+        ENTRPS_NM: "인천광역시",
+        RECRIT_TITL: getTagValue("sj") || "",
+        RECRIT_DEPT: getTagValue("rcritJssfc") || "",
+        NCCS_RCEPT_DT: rceptPeriod,
+        NCCS_RCEPT_MTHD: getTagValue("rceptMth") || "",
+        WAGE: getTagValue("wageCnd") || "",
+        WORK_PARD: getTagValue("emplymStle") || "",
+        WORK_LOC: "인천광역시",
+        REGISTR_DE: getTagValue("writngDe") || "",
+      }
+    })
     
     console.log("[DEBUG] Parsed job data:", jobData)
     return { success: true, data: jobData }
