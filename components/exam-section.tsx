@@ -24,7 +24,11 @@ interface ExamData {
   wrterDeptNm?: string
 }
 
-export function ExamSection() {
+interface ExamSectionProps {
+  searchQuery: string
+}
+
+export function ExamSection({ searchQuery }: ExamSectionProps) {
   const [exams, setExams] = useState<ExamData[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -49,6 +53,12 @@ export function ExamSection() {
       setLoading(false)
     }
   }
+
+  // 검색 필터링
+  const filteredExams = exams.filter(exam => 
+    exam.RECRTITLE.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (exam.wrterDeptNm && exam.wrterDeptNm.toLowerCase().includes(searchQuery.toLowerCase()))
+  )
 
   if (loading) {
     return (
@@ -82,22 +92,24 @@ export function ExamSection() {
     )
   }
 
-  if (exams.length === 0) {
+  if (filteredExams.length === 0) {
     return (
-      <Card className="p-8 text-center border-0 shadow-sm bg-gradient-to-br from-card to-muted/20">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
-            <BookOpen className="h-6 w-6 text-muted-foreground" />
+      <Card className="p-6 text-center border-0 shadow-sm bg-gradient-to-br from-card to-muted/20">
+        <div className="flex flex-col items-center gap-2">
+          <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+            <BookOpen className="h-5 w-5 text-muted-foreground" />
           </div>
-          <p className="text-sm text-muted-foreground">현재 등록된 시험정보가 없습니다</p>
+          <p className="text-xs text-muted-foreground">
+            {searchQuery ? "검색 결과가 없습니다" : "현재 등록된 시험정보가 없습니다"}
+          </p>
         </div>
       </Card>
     )
   }
 
   return (
-    <div className="space-y-4">
-      {exams.map((exam) => (
+    <div className="space-y-2">
+      {filteredExams.map((exam) => (
         <Card
           key={exam.RECRNO}
           className="group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-500 bg-gradient-to-br from-white via-white to-blue-50/50 dark:from-slate-900 dark:via-slate-900 dark:to-blue-900/20 hover:scale-[1.02] hover:-translate-y-1"
